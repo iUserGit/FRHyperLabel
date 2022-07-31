@@ -217,59 +217,7 @@ static UIColor *FRHyperLabelLinkColorHighlight;
 }
 
 - (CGRect)attributedTextBoundingBox {
-	if (CGRectGetWidth(_boundingBox) != 0) {
-		return _boundingBox;
-	}
-	
-	NSLayoutManager *layoutManager = [NSLayoutManager new];
-	NSTextContainer *textContainer = [[NSTextContainer alloc] initWithSize:CGSizeZero];
-	
-	textContainer.lineFragmentPadding = 0.0;
-	textContainer.lineBreakMode = self.lineBreakMode;
-	textContainer.maximumNumberOfLines = self.numberOfLines;
-	textContainer.size = self.bounds.size;
-	[layoutManager addTextContainer:textContainer];
-	
-	NSTextStorage *textStorage = [[NSTextStorage alloc] initWithAttributedString:self.attributedText];
-	[textStorage addLayoutManager:layoutManager];
-	
-	CGRect textBoundingBox = [layoutManager usedRectForTextContainer:textContainer];
-	
-	
-	CGFloat H = 0;
-	
-	CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString( (CFMutableAttributedStringRef) self.attributedText);
-	CGRect box = CGRectMake(0,0, CGRectGetWidth(textBoundingBox), CGFLOAT_MAX);
-	CFIndex startIndex = 0;
-	CGMutablePathRef path = CGPathCreateMutable();
-	CGPathAddRect(path, NULL, box);
-	CTFrameRef frame = CTFramesetterCreateFrame(framesetter, CFRangeMake(startIndex, 0), path, NULL);
-	
-	CFArrayRef lineArray = CTFrameGetLines(frame);
-	CFIndex j = 0;
-	CFIndex lineCount = CFArrayGetCount(lineArray);
-	if (lineCount > self.numberOfLines && self.numberOfLines != 0) {
-		lineCount = self.numberOfLines;
-	}
-	
-	CGFloat h, ascent, descent, leading;
-	
-	for (j = 0; j < lineCount; j++) {
-		CTLineRef currentLine = (CTLineRef)CFArrayGetValueAtIndex(lineArray, j);
-		CTLineGetTypographicBounds(currentLine, &ascent, &descent, &leading);
-		h = ascent + descent + leading;
-		H += h;
-	}
-	
-	CFRelease(frame);
-	CFRelease(path);
-	CFRelease(framesetter);
-	
-	box.size.height = H;
-	
-	_boundingBox = box;
-	
-	return box;
+    return self.bounds;
 }
 
 
