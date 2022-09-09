@@ -217,7 +217,9 @@ static UIColor *FRHyperLabelLinkColorHighlight;
 }
 
 - (CGRect)attributedTextBoundingBox {
-    return self.bounds;
+    CGRect dd = self.bounds;
+    dd.size.height += 10;
+    return dd;
 }
 
 
