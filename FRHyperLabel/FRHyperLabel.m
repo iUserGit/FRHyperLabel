@@ -94,12 +94,33 @@ static UIColor *FRHyperLabelLinkColorHighlight;
 }
 
 - (void)setLinkForSubstring:(NSString *)substring withAttribute:(NSDictionary *)attribute andLinkHandler:(void(^)(FRHyperLabel *label, NSString *substring))handler {
-	NSRange range = [self.attributedText.string rangeOfString:substring];
-	if (range.length) {
-		[self setLinkForRange:range withAttributes:attribute andLinkHandler:^(FRHyperLabel *label, NSRange range){
-			handler(label, [label.attributedText.string substringWithRange:range]);
-		}];
-	}
+//	NSRange range = [self.attributedText.string rangeOfString:substring];
+//	if (range.length) {
+//		[self setLinkForRange:range withAttributes:attribute andLinkHandler:^(FRHyperLabel *label, NSRange range){
+//			handler(label, [label.attributedText.string substringWithRange:range]);
+//		}];
+//	}
+    
+    NSRange searchRange = NSMakeRange(0, self.attributedText.string.length);
+    NSRange foundRange;
+    while (searchRange.location < self.attributedText.string.length) {
+        searchRange.length = self.attributedText.string.length-searchRange.location;
+        foundRange = [self.attributedText.string rangeOfString:substring options:0 range:searchRange];
+        if (foundRange.location != NSNotFound) {
+            
+            if (foundRange.length) {
+                [self setLinkForRange:foundRange withAttributes:attribute andLinkHandler:^(FRHyperLabel *label, NSRange range){
+                    handler(label, [label.attributedText.string substringWithRange:range]);
+                }];
+            }
+            
+            // found an occurrence of the substring! do stuff here
+            searchRange.location = foundRange.location+foundRange.length;
+        } else {
+            // no more substring to find
+            break;
+        }
+    }
 }
 
 - (void)setLinkForSubstring:(NSString *)substring withLinkHandler:(void(^)(FRHyperLabel *label, NSString *substring))handler {
@@ -217,9 +238,9 @@ static UIColor *FRHyperLabelLinkColorHighlight;
 }
 
 - (CGRect)attributedTextBoundingBox {
-    CGRect dd = self.bounds;
-    dd.size.height += 10;
-    return dd;
+    CGRect bounds = self.bounds;
+    bounds.size.height += 10;
+    return bounds;
 }
 
 
